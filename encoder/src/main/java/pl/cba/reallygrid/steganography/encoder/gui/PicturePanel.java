@@ -1,13 +1,28 @@
 package pl.cba.reallygrid.steganography.encoder.gui;
 
-import pl.cba.reallygrid.steganography.encoder.util.GBC;
+import pl.cba.reallygrid.steganography.util.CompatibleImage;
+import pl.cba.reallygrid.steganography.util.GBC;
 
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
+import java.awt.image.BufferedImage;
 
 class PicturePanel extends JPanel {
     PicturePanel() {
         super(new GridBagLayout());
+    }
+    
+    void addOriginalImage(BufferedImage image) {
+        BufferedImage compatibleImage = CompatibleImage.toCompatibleImage(image);
+        originalImagePanel.addImage(compatibleImage);
+    }
+    
+    void addEncodedImage(BufferedImage image) {
+        encodedImagePanel.addImage(image);
+    }
+    
+    BufferedImage getOriginalImage() {
+        return originalImagePanel.getImage();
     }
     
     private ImagePanel originalImagePanel = new ImagePanel("Original image");

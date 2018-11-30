@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 class ImagePanel extends JPanel {
     ImagePanel(String title) {
@@ -19,9 +21,23 @@ class ImagePanel extends JPanel {
         setBorder(border);
     }
     
-    private static final int EMPTY_BORDER_MARGIN = 6;
+    void addImage(BufferedImage compatibleImage) {
+        image = compatibleImage;
+    }
     
-    private JPanel panel = new JPanel(null);
+    BufferedImage getImage() {
+        return image;
+    }
+    
+    private static final int EMPTY_BORDER_MARGIN = 6;
+    private BufferedImage image;
+    
+    private JPanel panel = new JPanel(null) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.drawImage(image, 0, 0, null);
+        }
+    };
     
     {
         add(new JScrollPane(panel), BorderLayout.CENTER);

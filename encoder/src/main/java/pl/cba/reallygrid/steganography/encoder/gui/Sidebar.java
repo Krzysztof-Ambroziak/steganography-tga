@@ -1,6 +1,7 @@
 package pl.cba.reallygrid.steganography.encoder.gui;
 
-import pl.cba.reallygrid.steganography.encoder.util.GBC;
+import pl.cba.reallygrid.steganography.encoder.service.ActionProvider;
+import pl.cba.reallygrid.steganography.util.GBC;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -13,6 +14,25 @@ import static pl.cba.reallygrid.steganography.encoder.gui.Frame.LAYOUT_PADDING;
 class Sidebar extends JPanel {
     Sidebar() {
         super(new GridBagLayout());
+    }
+    
+    void addActions(ActionProvider actionProvider) {
+        loadImage.addActionListener(actionProvider.loadImageAction);
+        createEncodedImage.addActionListener(actionProvider.saveTextToImage);
+        saveImage.addActionListener(actionProvider.saveImageAction);
+    }
+    
+    String getTextFromTextArea() {
+        return inputText.getText();
+    }
+    
+    void enabledAfterImageLoading() {
+        inputText.setEnabled(true);
+        createEncodedImage.setEnabled(true);
+    }
+    
+    void enabledAfterEncoding() {
+        saveImage.setEnabled(true);
     }
     
     private static final int COMPONENT_MARGIN = 8;

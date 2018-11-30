@@ -1,4 +1,4 @@
-package pl.cba.reallygrid.steganography.encoder.util;
+package pl.cba.reallygrid.steganography.util;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;

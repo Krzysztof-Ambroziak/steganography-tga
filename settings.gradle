@@ -1,3 +1,5 @@
 rootProject.name = 'steganography-java'
 include 'encoder'
+include 'util'
+include 'image-tga'
 
