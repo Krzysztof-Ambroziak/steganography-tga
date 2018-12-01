@@ -26,4 +26,11 @@ public class GBC extends GridBagConstraints {
         
         return this;
     }
+    
+    public GBC ipad(int ipadx, int ipady) {
+        this.ipadx = ipadx;
+        this.ipady = ipady;
+        
+        return this;
+    }
 }

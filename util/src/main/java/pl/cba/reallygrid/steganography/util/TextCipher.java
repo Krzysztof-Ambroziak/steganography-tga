@@ -10,6 +10,17 @@ public class TextCipher {
         LOGGER.info("Text has been encoded successfully.");
     }
     
+    public static String decode(int size, int[] pixels) {
+        int steps = (size + 2) / 3; // text will be decoding from 8 pixels and 3 channels
+        byte[] bytes = new byte[size];
+        
+        for(int step = 0; step < steps; ++step) {
+            readThreeBytes(step, bytes, pixels);
+        }
+        
+        return new String(bytes);
+    }
+    
     private TextCipher(byte[] charCodes, int[] destination) {
         this.charCodes = charCodes;
         this.destination = destination;
@@ -49,22 +60,47 @@ public class TextCipher {
         }
     }
     
+    private static void readThreeBytes(int step, byte[] bytes, int[] pixels) {
+        int size = bytes.length;
+        
+        readByte(step, Channel.FIRST, pixels, bytes);
+        if((step * 3 + Channel.SECOND.channelOrder) < size) {
+            readByte(step, Channel.SECOND, pixels, bytes);
+        }
+        if((step * 3 + Channel.THIRD.channelOrder) < size) {
+            readByte(step, Channel.THIRD, pixels, bytes);
+        }
+    }
+    
+    private static void readByte(int step, Channel channel, int[] pixels, byte[] bytes) {
+        int index = step * 8;
+        int charUnit = 0;
+        
+        for(int i = 0; i < 8; i++) {
+            int pixel = (pixels[index + i] >> channel.channelPosition) & 0x00000001;
+            charUnit |= (pixel << i);
+        }
+        bytes[step * 3 + channel.channelOrder] = (byte)charUnit;
+    }
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(TextCipher.class);
     
     private final byte[] charCodes;
     private final int[] destination;
     
     private enum Channel {
-        FIRST(0),
-        SECOND(8),
-        THIRD(16),
-        FOURTH(24); // Fourth channel is not use. Not every tga file has alpha channel.
+        FIRST(0, 0),
+        SECOND(8, 1),
+        THIRD(16, 2),
+        FOURTH(24, 3); // Fourth channel is not use. Not every tga file has alpha channel.
         
-        Channel(int channelPosition) {
+        Channel(int channelPosition, int channelOrder) {
             this.channelPosition = channelPosition;
+            this.channelOrder = channelOrder;
         }
         
         private final int channelPosition;
+        private final int channelOrder;
     }
     
     private enum Bit {
