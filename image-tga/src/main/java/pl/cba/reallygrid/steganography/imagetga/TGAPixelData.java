@@ -1,6 +1,11 @@
 package pl.cba.reallygrid.steganography.imagetga;
 
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 final class TGAPixelData {
@@ -12,6 +17,43 @@ final class TGAPixelData {
         pixelData.setCorrectOrder(header.getImageOrigin());
         
         return pixelData;
+    }
+    
+    static void write(BufferedImage image, DataOutputStream outputStream) throws IOException {
+        WritableRaster raster = image.getRaster();
+        DataBufferInt dataBuffer = (DataBufferInt)raster.getDataBuffer();
+        int[] bufferData = dataBuffer.getData();
+        
+        if(image.getTransparency() == Transparency.OPAQUE) {
+            writeOpaqueData(bufferData, outputStream);
+        }
+        else {
+            writeTranslucentData(bufferData, outputStream);
+        }
+    }
+    
+    private static void writeOpaqueData(int[] bufferData, DataOutputStream outputStream) throws IOException {
+        for(int data : bufferData) {
+            int red = data & 0x000000FF;
+            int green = (data >> 8) & 0x000000FF;
+            int blue = (data >> 16) & 0x000000FF;
+            outputStream.writeByte(red);
+            outputStream.writeByte(green);
+            outputStream.writeByte(blue);
+        }
+    }
+    
+    private static void writeTranslucentData(int[] bufferData, DataOutputStream outputStream) throws IOException {
+        for(int data : bufferData) {
+            int red = data & 0x000000FF;
+            int green = (data >> 8) & 0x000000FF;
+            int blue = (data >> 16) & 0x000000FF;
+            int alpha = (data >> 24) & 0x000000FF;
+            outputStream.writeByte(blue);
+            outputStream.writeByte(green);
+            outputStream.writeByte(red);
+            outputStream.writeByte(alpha);
+        }
     }
     
     private TGAPixelData(TGAHeader header) {

@@ -55,7 +55,7 @@ public class ActionProvider {
         @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = guiService.getFileChooser();
-    
+            
             PreferencesKeys lastPath = PreferencesKeys.LAST_OPEN_PATH;
             String path = Preferences.getString(lastPath);
             
@@ -108,7 +108,31 @@ public class ActionProvider {
     public ActionListener saveImageAction = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // todo napisać zapisywanie zakodowanego obrazka do pliku tga
+            JFileChooser fileChooser = guiService.getFileChooser();
+    
+            PreferencesKeys lastPath = PreferencesKeys.LAST_SAVE_PATH;
+            String path = Preferences.getString(lastPath);
+            
+            fileChooser.setDialogTitle("Save image file");
+            fileChooser.setCurrentDirectory(new File(path));
+            showSaveDialog(fileChooser);
+        }
+        
+        private void showSaveDialog(JFileChooser fileChooser) {
+            JFrame frame = guiService.getFrame();
+            int returnValue = fileChooser.showSaveDialog(frame);
+            
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                checkSelectedFile(fileChooser.getSelectedFile());
+            }
+        }
+        
+        private void checkSelectedFile(File file) {
+            Preferences.putString(PreferencesKeys.LAST_SAVE_PATH, file.getParent());
+            
+            if(file.exists() && file.isFile() && file.canWrite() || !file.exists()) {
+                controller.saveFile(file);
+            }
         }
     };
     

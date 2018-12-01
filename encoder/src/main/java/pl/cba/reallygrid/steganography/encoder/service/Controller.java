@@ -60,6 +60,22 @@ public class Controller {
         });
     }
     
+    void saveFile(File file) {
+        singleThread.execute(() -> saveImage(file));
+    }
+    
+    private void saveImage(File file) {
+        try {
+            String textSize = String.valueOf(model.getText().getBytes().length);
+            BufferedImage image = guiService.getEncodedImage();
+            TGAImage.write(textSize, image, file);
+            LOGGER.info("file {} was successfully encoded.", file.getName());
+        }
+        catch(IOException e) {
+            guiService.showWarningDialog(e.getLocalizedMessage());
+        }
+    }
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
     private GuiService guiService = new GuiService();
     private Model model = new Model();

@@ -25,6 +25,10 @@ class PicturePanel extends JPanel {
         return originalImagePanel.getImage();
     }
     
+    BufferedImage getEncodedImage() {
+        return encodedImagePanel.getImage();
+    }
+    
     private ImagePanel originalImagePanel = new ImagePanel("Original image");
     private ImagePanel encodedImagePanel = new ImagePanel("Encoded image");
     

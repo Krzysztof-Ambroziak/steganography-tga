@@ -55,5 +55,9 @@ class Sidebar extends JPanel {
         add(saveImage, new GBC(0, 3)
                 .fill(GBC.HORIZONTAL)
                 .insets(0, 0, LAYOUT_PADDING, LAYOUT_PADDING));
+        
+        inputText.setEnabled(false);
+        createEncodedImage.setEnabled(false);
+        saveImage.setEnabled(false);
     }
 }

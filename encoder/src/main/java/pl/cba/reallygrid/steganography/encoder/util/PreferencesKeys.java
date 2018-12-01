@@ -6,7 +6,8 @@ public enum PreferencesKeys {
     WIDTH_FRAME(Preferences.WIDTH_FRAME),
     HEIGHT_FRAME(Preferences.HEIGHT_FRAME),
     FULL_FRAME(false),
-    LAST_OPEN_PATH(Preferences.DEFAULT_PATH);
+    LAST_OPEN_PATH(Preferences.DEFAULT_PATH),
+    LAST_SAVE_PATH(Preferences.DEFAULT_PATH);
     
     PreferencesKeys(Object DEFAULT_VALUE) {
         this.DEFAULT_VALUE = DEFAULT_VALUE;

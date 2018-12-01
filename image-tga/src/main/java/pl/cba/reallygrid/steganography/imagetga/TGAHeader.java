@@ -1,6 +1,8 @@
 package pl.cba.reallygrid.steganography.imagetga;
 
+import java.awt.Transparency;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 final class TGAHeader {
@@ -33,8 +35,38 @@ final class TGAHeader {
         return header;
     }
     
+    static TGAHeader getTrueColorHeader(String textSize, int width, int height, int transparency) {
+        TGAHeader header = new TGAHeader();
+        
+        header.idLength = textSize.length();
+        header.colorMapType = ColorMapType.NO_COLOR_MAP;
+        header.imageType = ImageType.UNCOMPRESSED_TRUE_COLOR;
+        
+        header.colorMapStart = 0;
+        header.colorMapLength = 0;
+        header.colorMapSize = 0;
+        
+        header.width = width;
+        header.height = height;
+        header.pixelDepth = (transparency == Transparency.OPAQUE) ? 24 : 32;
+        header.alphaChannelBits = (transparency == Transparency.OPAQUE) ? 0 : 8;
+        header.imageOrigin = ImageOrigin.TOP_LEFT;
+        
+        header.imageId = textSize.getBytes();
+        
+        return header;
+    }
+    
     private static int alphaBits(int imageDescriptor) {
         return imageDescriptor & 0x0000000F; // first 4 bits
+    }
+    
+    private static int descriptorEncoder(int alphaChannelBits, ImageOrigin imageOrigin) {
+        int value = imageOrigin.originValue();
+        value <<= 4;
+        value |= alphaChannelBits;
+        
+        return value;
     }
     
     private TGAHeader() {
@@ -82,6 +114,41 @@ final class TGAHeader {
         int origin = (imageDescriptor >> 4) & 0x00000003; // 4th and 5th bit
         
         return ImageOrigin.ImageOriginFromInt(origin);
+    }
+    
+    void saveHeader(DataOutputStream dis) throws IOException {
+        writeFirstThreeBytes(dis);
+        writeColorMapSpecification(dis);
+        writeImageSpecification(dis);
+        writeImageId(dis);
+    }
+    
+    private void writeFirstThreeBytes(DataOutputStream outputStream) throws IOException {
+        outputStream.writeByte(idLength);
+        outputStream.writeByte(colorMapType.mapTypeValue());
+        outputStream.writeByte(imageType.typeValue());
+    }
+    
+    private void writeColorMapSpecification(DataOutputStream outputStream) throws IOException {
+        // Color map specification: 5 bytes (2 bytes + 2 bytes + 1 byte)
+        outputStream.writeShort(Converter.convertFirstTwoBytes(colorMapStart));
+        outputStream.writeShort(Converter.convertFirstTwoBytes(colorMapLength));
+        outputStream.writeByte(colorMapSize);
+    }
+    
+    private void writeImageSpecification(DataOutputStream outputStream) throws IOException {
+        // Image specification: 10 bytes (2 bytes + 2 bytes + 2 bytes + 2 bytes + 1 byte + 1 byte)
+        outputStream.writeShort(Converter.convertFirstTwoBytes(xOrigin));
+        outputStream.writeShort(Converter.convertFirstTwoBytes(yOrigin));
+        outputStream.writeShort(Converter.convertFirstTwoBytes(width));
+        outputStream.writeShort(Converter.convertFirstTwoBytes(height));
+        outputStream.writeByte(pixelDepth);
+        int descriptor = TGAHeader.descriptorEncoder(alphaChannelBits, imageOrigin);
+        outputStream.writeByte(descriptor);
+    }
+    
+    private void writeImageId(DataOutputStream outputStream) throws IOException {
+        outputStream.write(imageId);
     }
     
     ColorMapType getColorMapType() {

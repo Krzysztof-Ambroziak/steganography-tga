@@ -75,6 +75,10 @@ public class GuiService {
         SwingUtilities.invokeLater(() -> frame.setVisible(true));
     }
     
+    public BufferedImage getEncodedImage() {
+        return picturePanel.getEncodedImage();
+    }
+    
     private Frame frame = new Frame();
     private PicturePanel picturePanel = new PicturePanel();
     private Sidebar sidebar = new Sidebar();

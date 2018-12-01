@@ -4,9 +4,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class TGAImage {
@@ -17,6 +20,20 @@ public class TGAImage {
             builder.append(imageId);
             
             return image.buildImage();
+        }
+    }
+    
+    public static void write(String text, BufferedImage image, File file) throws IOException {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int transparency = image.getTransparency();
+        
+        TGAHeader header = TGAHeader.getTrueColorHeader(text, width, height, transparency);
+        
+        try(DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+            header.saveHeader(dos);
+            TGAPixelData.write(image, dos);
+            TGAFooter.write(dos);
         }
     }
     
